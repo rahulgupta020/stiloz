@@ -215,7 +215,7 @@ const DoctorPosterGenerator = () => {
           />
           
           {/* Content overlay - now just displaying, not for input */}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+          <div style={{ position: 'absolute', top: -2.5, left: 0, width: '100%', height: '100%' }}>
             {/* Left-side layout */}
             <div style={{ display: 'flex', padding: '1rem' }}>
               {/* User Image */}
@@ -255,9 +255,10 @@ const DoctorPosterGenerator = () => {
                     color: '#ffffff', 
                     fontWeight: 'bold', 
                     fontSize: '0.5rem',
-                    marginBottom: '0.25rem',
+                    marginBottom: '0rem',
                     textAlign: 'left',
-                    display: 'block'
+                    display: 'block',
+                    top: '10rem'
                   }}
                 >
                   {doctorName || "Enter your name"}
