@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
+import padPoster from './assets/pad_poster_page.png';
 
 const DoctorPosterGenerator = () => {
   const [doctorName, setDoctorName] = useState('');
@@ -139,7 +140,7 @@ const DoctorPosterGenerator = () => {
         >
           {/* Background Image */}
           <img 
-            src="/pad_poster_page.png" 
+            src={padPoster} 
             alt="Doctor Poster Background" 
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             crossOrigin="anonymous"
