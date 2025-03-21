@@ -5,11 +5,11 @@ import ghPages from 'vite-plugin-gh-pages';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/stiloz/',
   plugins: [
     react(),
     tailwindcss(),
   ],
-  base: '/stiloz/',
   server: {
     allowedHosts: ['4bc9-103-83-216-194.ngrok-free.app'],
   },

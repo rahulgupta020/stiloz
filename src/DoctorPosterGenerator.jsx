@@ -37,42 +37,6 @@ const DoctorPosterGenerator = () => {
             allowTaint: true,
             backgroundColor: '#ffffff', // Use standard hex color
             scale: 2,
-            // This function runs on a clone of the DOM before rendering
-            onclone: (clonedDoc) => {
-              // Get the cloned input elements
-              const nameInputClone = clonedDoc.getElementById('doctorNameInput');
-              const specialtyInputClone = clonedDoc.getElementById('specialtyInput');
-              
-              // Replace the input values with span elements at exactly the same position
-              if (nameInputClone && specialtyInputClone) {
-                // Create spans with exact same styling as inputs
-                const nameSpan = clonedDoc.createElement('span');
-                nameSpan.textContent = doctorName || "Enter your name";
-                // Copy all styles from input to span
-                const nameStyles = window.getComputedStyle(document.getElementById('doctorNameInput'));
-                for (let style of nameStyles) {
-                  nameSpan.style[style] = nameStyles.getPropertyValue(style);
-                }
-                nameSpan.style.position = nameInputClone.style.position;
-                nameSpan.style.top = nameInputClone.style.top;
-                nameSpan.style.left = nameInputClone.style.left;
-                
-                const specialtySpan = clonedDoc.createElement('span');
-                specialtySpan.textContent = specialty || "Enter your specialty";
-                // Copy all styles from input to span
-                const specialtyStyles = window.getComputedStyle(document.getElementById('specialtyInput'));
-                for (let style of specialtyStyles) {
-                  specialtySpan.style[style] = specialtyStyles.getPropertyValue(style);
-                }
-                specialtySpan.style.position = specialtyInputClone.style.position;
-                specialtySpan.style.top = specialtyInputClone.style.top;
-                specialtySpan.style.left = specialtyInputClone.style.left;
-                
-                // Replace inputs with spans
-                nameInputClone.parentNode.replaceChild(nameSpan, nameInputClone);
-                specialtyInputClone.parentNode.replaceChild(specialtySpan, specialtyInputClone);
-              }
-            }
           });
           
           const image = canvas.toDataURL('image/png');
@@ -124,9 +88,113 @@ const DoctorPosterGenerator = () => {
         <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>STILOZ</h1>
       </div>
       
-      {/* Main Content */}
-      <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* Poster Content */}
+      {/* Input Form - Now above the poster preview */}
+      <div style={{ 
+        width: '100%', 
+        maxWidth: '28rem', 
+        marginTop: '1.5rem', 
+        padding: '1rem', 
+        backgroundColor: '#ffffff',
+        borderRadius: '0.5rem',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        marginBottom: '1rem'
+      }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
+            Doctor Name
+          </label>
+          <input
+            type="text"
+            value={doctorName}
+            onChange={(e) => setDoctorName(e.target.value)}
+            placeholder="Enter your name"
+            style={{ 
+              width: '100%',
+              padding: '0.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              outline: 'none',
+              fontSize: '0.875rem'
+            }}
+          />
+        </div>
+        
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
+            Specialty
+          </label>
+          <input
+            type="text"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            placeholder="Enter your specialty"
+            style={{ 
+              width: '100%',
+              padding: '0.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              outline: 'none',
+              fontSize: '0.875rem'
+            }}
+          />
+        </div>
+        
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
+            Profile Picture
+          </label>
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <div style={{ 
+              width: '3.7rem', 
+              height: '3.7rem', 
+              borderRadius: '50%', 
+              border: '2px solid #d1d5db', 
+              overflow: 'hidden', 
+              backgroundColor: '#e5e7eb',
+              marginRight: '1rem',
+              position: 'relative'
+            }}>
+              {imageUrl ? (
+                <img 
+                  src={imageUrl} 
+                  alt="Doctor" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  width: '100%', 
+                  height: '100%', 
+                  color: '#6b7280',
+                  fontSize: '1.5rem'
+                }}>
+                  <span>+</span>
+                </div>
+              )}
+              
+              <input 
+                type="file" 
+                accept="image/*" 
+                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                onChange={handleImageChange}
+              />
+            </div>
+            <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+              Click to upload your profile photo
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Poster Preview */}
+      <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h2 style={{ marginBottom: '0.75rem', fontWeight: '600', color: '#1f2937' }}>Poster Preview</h2>
+        
         <div 
           ref={contentRef} 
           style={{ 
@@ -146,18 +214,19 @@ const DoctorPosterGenerator = () => {
             crossOrigin="anonymous"
           />
           
-          {/* Input area overlay */}
+          {/* Content overlay - now just displaying, not for input */}
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-            {/* User Image */}
-            <div style={{ marginTop: '1rem', marginLeft: '1rem' }}>
+            {/* Left-side layout */}
+            <div style={{ display: 'flex', padding: '1rem' }}>
+              {/* User Image */}
               <div style={{ 
-                position: 'relative', 
                 width: '3.7rem', 
                 height: '3.7rem', 
                 borderRadius: '50%', 
                 border: '2.5px solid #ffffff', 
                 overflow: 'hidden', 
-                backgroundColor: '#e5e7eb' 
+                backgroundColor: '#e5e7eb',
+                marginRight: '0.75rem'
               }}>
                 {imageUrl ? (
                   <img 
@@ -177,61 +246,36 @@ const DoctorPosterGenerator = () => {
                     <span>+</span>
                   </div>
                 )}
+              </div>
+              
+              {/* Text content - aligned to the left of the image */}
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <span
+                  style={{ 
+                    color: '#ffffff', 
+                    fontWeight: 'bold', 
+                    fontSize: '0.5rem',
+                    marginBottom: '0.25rem',
+                    textAlign: 'left',
+                    display: 'block'
+                  }}
+                >
+                  {doctorName || "Enter your name"}
+                </span>
                 
-                {/* Hidden file input */}
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
-                  onChange={handleImageChange}
-                />
+                <span
+                  style={{ 
+                    color: '#ffffff', 
+                    fontWeight: 'bold', 
+                    fontSize: '0.395rem',
+                    textAlign: 'left',
+                    display: 'block'
+                  }}
+                >
+                  {specialty || "Enter your specialty"}
+                </span>
               </div>
             </div>
-            
-            {/* Text inputs - using exact positioning to match the design */}
-            <input
-              id="doctorNameInput"
-              type="text"
-              value={doctorName}
-              onChange={(e) => setDoctorName(e.target.value)}
-              placeholder="Enter your name"
-              style={{ 
-                position: 'absolute',
-                top: '1.2rem',
-                left: '5.2rem', // 1rem + 3.7rem + 0.5rem
-                backgroundColor: 'transparent', 
-                color: '#ffffff', 
-                fontWeight: 'bold', 
-                fontSize: '0.5rem',
-                width: '10rem',
-                border: 'none',
-                outline: 'none',
-                padding: '0',
-                lineHeight: '4'
-              }}
-            />
-            
-            <input
-              id="specialtyInput"
-              type="text"
-              value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
-              placeholder="Enter your specialty"
-              style={{ 
-                position: 'absolute',
-                top: 'calc(1.25rem + 0.81rem)', // doctorName position + spacing
-                left: '5.2rem', // 1rem + 3.7rem + 0.5rem
-                backgroundColor: 'transparent', 
-                color: '#ffffff', 
-                fontWeight: 'bold', 
-                fontSize: '0.395rem',
-                width: '10rem',
-                border: 'none',
-                outline: 'none',
-                padding: '0',
-                lineHeight: '5'
-              }}
-            />
           </div>
         </div>
         
