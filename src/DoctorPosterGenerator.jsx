@@ -8,14 +8,55 @@ const DoctorPosterGenerator = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const contentRef = useRef(null);
 
-  // Handle image upload
+  // Handle image upload with resizing to prevent blurriness
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Create an image element for resizing before display
+      const img = new Image();
       const reader = new FileReader();
-      reader.onload = () => {
-        setImageUrl(reader.result);
+      
+      reader.onload = (event) => {
+        img.onload = () => {
+          // Create a canvas to resize the image properly
+          const canvas = document.createElement('canvas');
+          // Set canvas to a reasonable size that maintains quality
+          // Using a larger size than display size to ensure quality
+          const maxSize = 300; // Larger than the display area to maintain quality
+          
+          // Calculate new dimensions while preserving aspect ratio
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > maxSize) {
+              height = Math.round((height * maxSize) / width);
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = Math.round((width * maxSize) / height);
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Get context and draw resized image
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to data URL and set state
+          const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+          setImageUrl(optimizedDataUrl);
+        };
+        
+        img.src = event.target.result;
       };
+      
       reader.readAsDataURL(file);
     }
   };
@@ -31,15 +72,17 @@ const DoctorPosterGenerator = () => {
       // Apply the capture with a delay to ensure rendering is complete
       setTimeout(async () => {
         try {
-          // Create a modified version for capturing
+          // Create a modified version for capturing with improved quality
           const canvas = await html2canvas(contentRef.current, {
             useCORS: true,
             allowTaint: true,
-            backgroundColor: '#ffffff', // Use standard hex color
-            scale: 2,
+            backgroundColor: '#ffffff',
+            scale: 2, // Ensure consistent scale for better quality
+            logging: false,
+            imageRendering: 'pixelated'
           });
           
-          const image = canvas.toDataURL('image/png');
+          const image = canvas.toDataURL('image/png', 1.0); // Use maximum quality
           
           // Create a link element to download the image
           const link = document.createElement('a');
@@ -161,7 +204,12 @@ const DoctorPosterGenerator = () => {
                 <img 
                   src={imageUrl} 
                   alt="Doctor" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    imageRendering: 'crisp-edges',
+                  }}
                 />
               ) : (
                 <div style={{ 
@@ -232,7 +280,12 @@ const DoctorPosterGenerator = () => {
                   <img 
                     src={imageUrl} 
                     alt="Doctor" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      imageRendering: 'crisp-edges',
+                    }}
                   />
                 ) : (
                   <div style={{ 
@@ -254,7 +307,7 @@ const DoctorPosterGenerator = () => {
                   style={{ 
                     color: '#ffffff', 
                     fontWeight: 'bold', 
-                    fontSize: '0.5rem',
+                    fontSize: '0.75rem', // Increased font size for better visibility
                     marginBottom: '0rem',
                     textAlign: 'left',
                     display: 'block',
@@ -268,7 +321,7 @@ const DoctorPosterGenerator = () => {
                   style={{ 
                     color: '#ffffff', 
                     fontWeight: 'bold', 
-                    fontSize: '0.395rem',
+                    fontSize: '0.6rem', // Increased font size for better visibility
                     textAlign: 'left',
                     display: 'block'
                   }}
